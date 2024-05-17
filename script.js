@@ -1,35 +1,39 @@
 let computerScore = 0;
 let humanScore = 0;
 
-const btnRock = document.createElement('button');
-btnRock.textContent = "ROCK";
-const btnPaper = document.createElement('button');
-btnPaper.textContent = "PAPER";
-const btnScissors = document.createElement('button');
-btnScissors.textContent = "SCISSORS";
-let choiceBtns = [btnRock, btnPaper, btnScissors];
-choiceBtns.forEach((btn) => btn.addEventListener('click', () => {playRound(btn.textContent)}))
-
 /** @type {HTMLDivElement} */
 const rpsBtnsDiv = document.querySelector("#rpsBtns");
+    const btnRock = document.createElement('button');
+    btnRock.textContent = "ROCK";
+    const btnPaper = document.createElement('button');
+    btnPaper.textContent = "PAPER";
+    const btnScissors = document.createElement('button');
+    btnScissors.textContent = "SCISSORS";
+    let choiceBtns = [btnRock, btnPaper, btnScissors];
+    choiceBtns.forEach((btn) => btn.addEventListener('click', () => {playRound(btn.textContent)}))
 rpsBtnsDiv.append(btnRock,btnPaper,btnScissors);
 rpsBtnsDiv.style.visibility = "hidden";
 
-/** @type {HTMLInputElement} */
-const rangeRoundCount = document.querySelector('input[type="range"]');
-const btnNewMatch = document.createElement('button');
-btnNewMatch.textContent = "New Match";
-btnNewMatch.addEventListener('click', () => {playMatch(rangeRoundCount.value)});
 /** @type {HTMLDivElement} */
 const matchControlsDiv = document.querySelector("#matchControls");
+    /** @type {HTMLInputElement} */
+    const rangeRoundCount = document.querySelector('input[type="range"]');
+    const btnNewMatch = document.createElement('button');
+    btnNewMatch.textContent = "New Match";
+    btnNewMatch.addEventListener('click', startMatch);
 matchControlsDiv.appendChild(btnNewMatch);
+
+/** @type {HTMLDivElement} */
+const scoreDiv = document.querySelector("#scores");
+/** @type {HTMLHeadingElement} */
+const roundResultH3 = document.querySelector("#roundResult");
+/** @type {HTMLHeadingElement} */
+const matchResultH1 = document.querySelector("#matchResult");
 
 function playRound(humanChoice) {
     let computerChoice = getComputerChoice();
-    console.log("Computer chose: ", computerChoice);
-    console.log("Human chose: ", humanChoice);
     if (computerChoice === humanChoice) {
-        console.log("Draw! Try again")
+        drawRound(humanChoice)
     }
     else if (computerChoice === "ROCK"){
         if (humanChoice === "PAPER") {
@@ -47,20 +51,40 @@ function playRound(humanChoice) {
             winRound(humanChoice,computerChoice);
         }
         else loseRound(humanChoice,computerChoice);
+    printScores();
+    if (computerScore == (+rangeRoundCount.value+1)/2 || humanScore == (+rangeRoundCount.value+1)/2) {
+        endMatch();
     }
+}
 
-function playMatch(rounds) {
+function startMatch() {
     humanScore = 0;
     computerScore = 0;
-    rpsBtnsDiv.style.visibility = "visible";
-    matchControlsDiv.style.visibility = "hidden";
-    while (false) {}
-    console.log("Match over!");
+    toggleBtnVisibility();
+    printScores()
+    roundResultH3.textContent = "";
+    matchResultH1.textContent = "";
+}
+
+function endMatch() {
+    toggleBtnVisibility();
+    let matchResultText = "Match over! ";
     if (humanScore > computerScore) {
-        console.log("You win the match! CONGRATULATIONS!");
+        matchResultText += "You win! CONGRATULATIONS!";
     } 
-    else  console.log("You have lost! Better luck next time!");
-}    
+    else  matchResultText += "You lose! Better luck next time!";
+    matchResultH1.textContent = matchResultText;
+}
+
+function toggleBtnVisibility() {
+    if (rpsBtnsDiv.style.visibility == "visible") {
+        rpsBtnsDiv.style.visibility = "hidden";
+        matchControlsDiv.style.visibility = "visible";
+    } else {
+        rpsBtnsDiv.style.visibility = "visible";
+        matchControlsDiv.style.visibility = "hidden";
+    }    
+}
 
 function getComputerChoice() {
     let choice = Math.random();
@@ -74,11 +98,19 @@ function getComputerChoice() {
 }
 
 function winRound(humanChoice, computerChoice) {
-    console.log("You win! ", humanChoice, " beats ", computerChoice, ".")
+    roundResultH3.textContent = "You win! " + humanChoice + " beats " + computerChoice + ".";
     humanScore += 1;
 }
 
 function loseRound(humanChoice, computerChoice) {
-    console.log("You lose! ", computerChoice, " beats ", humanChoice, ".")
+    roundResultH3.textContent = "You lose! " + computerChoice + " beats " + humanChoice + ".";
     computerScore += 1;
+}
+
+function drawRound(choice) {
+    roundResultH3.textContent = "Draw! Both players chose " + choice + ". Try again!";
+}
+
+function printScores() {
+    scoreDiv.textContent = "Human score: " + humanScore + " Computer score: " + computerScore;
 }
