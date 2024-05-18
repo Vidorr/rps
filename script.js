@@ -1,26 +1,19 @@
 let computerScore = 0;
 let humanScore = 0;
+let choiceArray = ["Thingy", "Whatsit", "DooDad"]
 
 /** @type {HTMLDivElement} */
 const rpsBtnsDiv = document.querySelector("#rpsBtns");
-    const btnRock = document.createElement('button');
-    btnRock.textContent = "ROCK";
-    const btnPaper = document.createElement('button');
-    btnPaper.textContent = "PAPER";
-    const btnScissors = document.createElement('button');
-    btnScissors.textContent = "SCISSORS";
-    let choiceBtns = [btnRock, btnPaper, btnScissors];
-    choiceBtns.forEach((btn) => btn.addEventListener('click', () => {playRound(btn.textContent)}))
-rpsBtnsDiv.append(btnRock,btnPaper,btnScissors);
+choiceArray.forEach((text) => {createPlayerButton(text)})
 rpsBtnsDiv.style.visibility = "hidden";
 
 /** @type {HTMLDivElement} */
 const matchControlsDiv = document.querySelector("#matchControls");
-    /** @type {HTMLInputElement} */
-    const rangeRoundCount = document.querySelector('input[type="range"]');
-    const btnNewMatch = document.createElement('button');
-    btnNewMatch.textContent = "New Match";
-    btnNewMatch.addEventListener('click', startMatch);
+/** @type {HTMLInputElement} */
+const rangeRoundCount = document.querySelector('input[type="range"]');
+const btnNewMatch = document.createElement('button');
+btnNewMatch.textContent = "New Match";
+btnNewMatch.addEventListener('click', startMatch);
 matchControlsDiv.appendChild(btnNewMatch);
 
 /** @type {HTMLDivElement} */
@@ -30,27 +23,22 @@ const roundResultH3 = document.querySelector("#roundResult");
 /** @type {HTMLHeadingElement} */
 const matchResultH1 = document.querySelector("#matchResult");
 
+function createPlayerButton(text) {
+    let btn = document.createElement('button');
+    btn.textContent = text;
+    btn.addEventListener('click', () => {playRound(text)})
+    rpsBtnsDiv.appendChild(btn);
+}
+
 function playRound(humanChoice) {
     let computerChoice = getComputerChoice();
+    let computerLoseChoice = (choiceArray[choiceArray.indexOf(humanChoice) - 1] || choiceArray[choiceArray.length - 1]);
     if (computerChoice === humanChoice) {
         drawRound(humanChoice)
     }
-    else if (computerChoice === "ROCK"){
-        if (humanChoice === "PAPER") {
+    else if (computerChoice == computerLoseChoice) {
             winRound(humanChoice,computerChoice);
-        }
-        else loseRound(humanChoice,computerChoice);
-    }
-    else if (computerChoice === "PAPER"){
-        if (humanChoice === "SCISSORS") {
-            winRound(humanChoice,computerChoice);
-        }
-        else loseRound(humanChoice,computerChoice);
-    }
-    else if (humanChoice === "ROCK") {
-            winRound(humanChoice,computerChoice);
-        }
-        else loseRound(humanChoice,computerChoice);
+        } else loseRound(humanChoice,computerChoice);
     printScores();
     if (computerScore == (+rangeRoundCount.value+1)/2 || humanScore == (+rangeRoundCount.value+1)/2) {
         endMatch();
@@ -87,14 +75,7 @@ function toggleBtnVisibility() {
 }
 
 function getComputerChoice() {
-    let choice = Math.random();
-    if (choice < 1/3) {
-        return "ROCK";
-    }
-    else if (choice < 2/3) {
-        return "PAPER";
-    }
-    else return "SCISSORS"
+    return choiceArray[Math.floor(Math.random()*choiceArray.length)]
 }
 
 function winRound(humanChoice, computerChoice) {
